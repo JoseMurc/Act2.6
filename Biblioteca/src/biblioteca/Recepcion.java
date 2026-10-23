@@ -1,7 +1,7 @@
 package biblioteca;
 
 // REMOVE MIDDLE MAN
-//catalogo se removio de Main, bien se podria eliminar la clase
+//la clase se removio de Main, bien se podria eliminar la clase
 public class Recepcion {
     private Catalogo catalogo;
 
