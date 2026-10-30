@@ -16,6 +16,7 @@ public class Funcion {
     }
 
     // TÉCNICA UTILIZADA: Replace Exception with Test
+    // TÉCNICA UTILIZADA: Separate Query from modifier
     // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios:
     // - Se agregó estaDisponible para consultar antes de modificar la función.
     // - ocupar dejó de lanzar una excepción para controlar el asiento ocupado.
