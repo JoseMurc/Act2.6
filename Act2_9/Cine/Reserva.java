@@ -7,12 +7,16 @@ public class Reserva {
     public List<String> asientos;
     public double precio;
     public boolean cancelada;
+    //Se añadio atributo canal por el problema 3
+    public String canal;
 
-    public Reserva(int id, Cliente cliente, Funcion funcion, List<String> asientos) {
+    public Reserva(int id, Cliente cliente, Funcion funcion, List<String> asientos, String canal) {
         this.id = id;
         this.cliente = cliente;
         this.funcion = funcion;
         this.asientos = asientos;
+        //Se añadio parametro y asignacion de canal por el problema 3
+        this.canal = canal;
     }
 
     public void setCancelada(boolean cancelada) {

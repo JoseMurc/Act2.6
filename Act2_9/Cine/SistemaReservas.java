@@ -13,7 +13,13 @@ public class SistemaReservas {
     // - Los datos inválidos ya lanzan IllegalArgumentException.
     // - El método ya no devuelve -1 ni -2 para representar errores.
     // - La ocupación fallida propaga IllegalStateException en lugar de devolver -3.
-    public int hacer(String nombre, String email, boolean socio, Funcion f, char[] filas, int[] numeros, boolean imprimir, String canal) {
+
+    // TECNICA UTILIZADA: Rename Method
+    // REFACTOR: Se renombró el método crearReserva() para reflejar mejor su propósito y mejorar la legibilidad del código.
+
+    //TECNICA UTILIZADA: Remove Parameter
+    // REFACTOR: Se elimino el parametro boolean imprimir del metodo crearReserva ya que no se utilizaba
+    public int crearReserva(String nombre, String email, boolean socio, Funcion f, char[] filas, int[] numeros, String canal) {
         if (nombre == null || nombre.isBlank()) {
             throw new IllegalArgumentException("El nombre del cliente es obligatorio");
         }
@@ -35,7 +41,10 @@ public class SistemaReservas {
             lista.add("" + filas[i] + numeros[i]);
         }
         Cliente c = new Cliente(nombre, email, socio);
-        Reserva r = new Reserva(contador, c, f, lista);
+        // TECNICA UTILIZADA: Add parameter
+        // REFACTOR: Se añadio el parametro canal a la clase Reserva como un atributo y parametro de su constructor 
+        // para añadirlo en esta llamada al constructor
+        Reserva r = new Reserva(contador, c, f, lista, canal);
         r.precio = calcularPrecio(r, socio ? "socio" : "general");
         db.put(contador, r);
         contador++;
