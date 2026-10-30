@@ -7,26 +7,34 @@ public class SistemaReservas {
     public Map<Integer, Object> db = new HashMap<>();
     public int contador = 1;
 
-    // Nombre poco claro, muchos parámetros sueltos, flag sin uso y códigos de error
-    public int hacer(String nombre, String email, boolean socio, Funcion f,
-                     char[] filas, int[] numeros, boolean imprimir, String canal) {
-        if (nombre == null || f == null) return -1;
-        if (filas.length == 0 || filas.length != numeros.length) return -2;
-        try {
-            List<String> lista = new ArrayList<>();
-            for (int i = 0; i < filas.length; i++) {
-                f.ocupar(filas[i], numeros[i]);   // si falla a mitad, los anteriores ya quedaron ocupados
-                lista.add("" + filas[i] + numeros[i]);
-            }
-            Cliente c = new Cliente(nombre, email, socio);
-            Reserva r = new Reserva(contador, c, f, lista);
-            r.precio = calcularPrecio(r, socio ? "socio" : "general");
-            db.put(contador, r);
-            contador++;
-            return r.id;
-        } catch (IllegalStateException e) {
-            return -3;
+    // Nombre poco claro, muchos parámetros sueltos y flag sin uso
+    // TÉCNICA UTILIZADA: Replace Error Code with Exception
+    // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios:
+    // - Los datos inválidos ya lanzan IllegalArgumentException.
+    // - El método ya no devuelve -1 ni -2 para representar errores.
+    // - La ocupación fallida propaga IllegalStateException en lugar de devolver -3.
+    public int hacer(String nombre, String email, boolean socio, Funcion f, char[] filas, int[] numeros, boolean imprimir, String canal) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("El nombre del cliente es obligatorio");
         }
+        if (f == null) {
+            throw new IllegalArgumentException("La función es obligatoria");
+        }
+        if (filas == null || numeros == null || filas.length == 0 || filas.length != numeros.length) {
+            throw new IllegalArgumentException("Los asientos deben tener filas y números válidos");
+        }
+
+        List<String> lista = new ArrayList<>();
+        for (int i = 0; i < filas.length; i++) {
+            f.ocupar(filas[i], numeros[i]);   // si falla a mitad, los anteriores ya quedaron ocupados
+            lista.add("" + filas[i] + numeros[i]);
+        }
+        Cliente c = new Cliente(nombre, email, socio);
+        Reserva r = new Reserva(contador, c, f, lista);
+        r.precio = calcularPrecio(r, socio ? "socio" : "general");
+        db.put(contador, r);
+        contador++;
+        return r.id;
     }
 
     // Tipo de tarifa como String y if/else
