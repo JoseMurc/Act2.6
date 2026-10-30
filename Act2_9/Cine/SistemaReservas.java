@@ -26,7 +26,12 @@ public class SistemaReservas {
 
         List<String> lista = new ArrayList<>();
         for (int i = 0; i < filas.length; i++) {
-            f.ocupar(filas[i], numeros[i]);   // si falla a mitad, los anteriores ya quedaron ocupados
+            if (!f.estaDisponible(filas[i], numeros[i])) {
+                throw new IllegalStateException("El asiento ya está ocupado");
+            }
+        }
+        for (int i = 0; i < filas.length; i++) {
+            f.ocupar(filas[i], numeros[i]);
             lista.add("" + filas[i] + numeros[i]);
         }
         Cliente c = new Cliente(nombre, email, socio);
