@@ -8,9 +8,13 @@ public class Main {
         System.out.println("Reserva Ana: " + r1);
 
         // F7 se marca como ocupado antes de fallar en F6 (bug)
-        int r2 = s.hacer("Luis", "luis@mail.com", false, f,
-                new char[]{'F', 'F'}, new int[]{7, 6}, false, "Taquilla");
-        System.out.println("Reserva Luis: " + r2);
+        try {
+            int r2 = s.hacer("Luis", "luis@mail.com", false, f,
+                    new char[]{'F', 'F'}, new int[]{7, 6}, false, "Taquilla");
+            System.out.println("Reserva Luis: " + r2);
+        } catch (IllegalStateException e) {
+            System.out.println("Reserva Luis: error - " + e.getMessage());
+        }
         System.out.println("Ocupados: " + f.ocupados);
 
         Reserva ana = s.buscar(1);
