@@ -104,7 +104,7 @@ public class SistemaReservas {
         for (String a : r.asientos) {
             r.funcion.ocupados.remove(a);
         }
-        r.setCancelada(true);
+        r.cancelada = true;
         return 0;
     }
 
