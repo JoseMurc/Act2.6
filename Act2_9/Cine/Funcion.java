@@ -35,7 +35,6 @@ public class Funcion {
         return true;
     }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
+     // TÉCNICA UTILIZADA: Remove setting method
+    //remove setPrecio que no se usa
 }
