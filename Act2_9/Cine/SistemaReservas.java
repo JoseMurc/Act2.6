@@ -48,6 +48,12 @@ public class SistemaReservas {
         return p - p * 0.25;
     }
 
+    // TÉCNICA UTILIZADA: Encapsulate Downcast
+    // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios…
+    public Reserva buscarReserva(int id) {
+        return (Reserva) db.get(id);
+    }
+
     // Downcast repetido en cada llamada
     public int cancelar(int id) {
         Reserva r = buscarReserva(id);
