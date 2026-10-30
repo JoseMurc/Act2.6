@@ -45,29 +45,44 @@ public class SistemaReservas {
         // REFACTOR: Se añadio el parametro canal a la clase Reserva como un atributo y parametro de su constructor 
         // para añadirlo en esta llamada al constructor
         Reserva r = new Reserva(contador, c, f, lista, canal);
-        r.precio = calcularPrecio(r, socio ? "socio" : "general");
+        if (socio) {
+        // tecnica utlizada: replace parameter with explicit method
+        r.precio = calcularPrecioSocio(r);
+        } else {
+        r.precio = calcularPrecioGeneral(r);
+        }
         db.put(contador, r);
         contador++;
         return r.id;
     }
 
-    // Tipo de tarifa como String y if/else
-    public double calcularPrecio(Reserva r, String tipo) {
+     // tecnica utilizada: replace parameter with method
+    // refactor: se elimino el parametro tipo porque el metodo ya puede consultar directamente si el cliente es socio desde la reserva
+    public double calcularPrecio(Reserva r) {
         double base = r.funcion.precio * r.asientos.size();
-        if (tipo.equals("general")) {
-            return base;
-        } else if (tipo.equals("socio")) {
-            return descuentoDel15(base);
-        }
+        if (r.cliente.socio) {
+            return aplicarDescuento(base, 0.15);
+        } 
         return base;
     }
-
-    public double descuentoDel15(double p) {
-        return p - p * 0.15;
+    
+    // tecnica utlizada: replace parameter with explicit method
+    // Calcula el precio de una reserva general
+    public double calcularPrecioGeneral(Reserva r) {
+    double base = r.funcion.precio * r.asientos.size();
+    return base;
     }
 
-    public double descuentoDel25(double p) {   // duplicado, sin uso
-        return p - p * 0.25;
+    // Calcula el precio de una reserva para socios
+    public double calcularPrecioSocio(Reserva r) {
+    double base = r.funcion.precio * r.asientos.size();
+    return aplicarDescuento(base, 0.15);
+    }
+    
+    // tecnica utlizada: parameterize method
+    public double aplicarDescuento(double precio, double porcentaje) {
+
+    return precio - precio * porcentaje;
     }
 
     // TÉCNICA UTILIZADA: Encapsulate Downcast
