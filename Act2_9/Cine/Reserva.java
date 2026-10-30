@@ -19,7 +19,7 @@ public class Reserva {
         this.canal = canal;
     }
 
-    public void setCancelada(boolean cancelada) {
-        this.cancelada = cancelada;
-    }
+    // TÉCNICA UTILIZADA: Remove setting method
+    //remove setCancelada que no se usa
+    
 }
