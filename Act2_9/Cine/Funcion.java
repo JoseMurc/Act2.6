@@ -15,13 +15,23 @@ public class Funcion {
         this.precio = precio;
     }
 
-    // Ocupa el asiento y lanza excepción si ya estaba ocupado
-    public void ocupar(char fila, int numero) {
+    // TÉCNICA UTILIZADA: Replace Exception with Test
+    // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios:
+    // - Se agregó estaDisponible para consultar antes de modificar la función.
+    // - ocupar dejó de lanzar una excepción para controlar el asiento ocupado.
+    // - ocupar devuelve false si el asiento ya está ocupado.
+    public boolean estaDisponible(char fila, int numero) {
         String codigo = "" + fila + numero;
-        if (ocupados.contains(codigo)) {
-            throw new IllegalStateException("Asiento ocupado: " + codigo);
+        return !ocupados.contains(codigo);
+    }
+
+    public boolean ocupar(char fila, int numero) {
+        if (!estaDisponible(fila, numero)) {
+            return false;
         }
+        String codigo = "" + fila + numero;
         ocupados.add(codigo);
+        return true;
     }
 
     public void setPrecio(double precio) {
