@@ -1,28 +1,54 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
         SistemaReservas s = new SistemaReservas();
         Funcion f = new Funcion("Interestelar", 3, "20:30", 12.0);
 
-        //Se elimino el parametro boolean imprimir de la llamada como parte del refactor del problema 2
-        int r1 = s.crearReserva("Ana", "ana@mail.com", true, f,
-                new char[]{'F', 'F'}, new int[]{5, 6},  "App");
+        // creamos el cliente y la lista de asientos usando objetos
+        Cliente clienteAna = new Cliente("Ana", "ana@mail.com", true);
+        List<Asiento> asientosAna = new ArrayList<>();
+        asientosAna.add(new Asiento('F', 5));
+        asientosAna.add(new Asiento('F', 6));
+
+        int r1 = s.crearReserva(clienteAna, f, asientosAna, "App");
         System.out.println("Reserva Ana: " + r1);
 
-        // F7 se marca como ocupado antes de fallar en F6 (bug)
+        // reserva de luis usando objetos y atrapando la excepcion si falla
+        Cliente clienteLuis = new Cliente("Luis", "luis@mail.com", false);
+        List<Asiento> asientosLuis = new ArrayList<>();
+        asientosLuis.add(new Asiento('F', 7));
+        asientosLuis.add(new Asiento('F', 6));
+
         try {
-            //Se elimino el parametro boolean imprimir de la llamada como parte del refactor del problema 2
-            int r2 = s.crearReserva("Luis", "luis@mail.com", false, f,
-                    new char[]{'F', 'F'}, new int[]{7, 6}, "Taquilla");
+            int r2 = s.crearReserva(clienteLuis, f, asientosLuis, "Taquilla");
             System.out.println("Reserva Luis: " + r2);
         } catch (IllegalStateException e) {
             System.out.println("Reserva Luis: error - " + e.getMessage());
         }
-        System.out.println("Ocupados: " + f.ocupados);
 
+        // consultamos los ocupados usando el metodo seguro de solo lectura
+        System.out.println("Ocupados: " + f.getOcupados());
+
+        // buscamos la reserva aprovechando el encapsulate downcast
         Reserva ana = s.buscar(1);
         System.out.println("Precio Ana (socio): " + ana.precio);
 
-        System.out.println("Cancelar 1: " + s.cancelar(1));
-        System.out.println("Cancelar 99: " + s.cancelar(99));
+        //TECNICA UTILIZADA: Replace Error Code with Exception
+        //REFACTOR: el metodo cancelar() ahora lanza excepciones en vez de devolver codigos, por lo que se usa try-catch.
+        try {
+            s.cancelar(1);
+            System.out.println("Cancelar 1: OK");
+        } catch (RuntimeException e) {
+            System.out.println("Cancelar 1: error - " + e.getMessage());
+        }
+
+        try {
+            s.cancelar(99);
+            System.out.println("Cancelar 99: OK");
+        } catch (RuntimeException e) {
+            System.out.println("Cancelar 99: error - " + e.getMessage());
+        }
     }
 }

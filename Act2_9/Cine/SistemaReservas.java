@@ -7,108 +7,102 @@ public class SistemaReservas {
     public Map<Integer, Object> db = new HashMap<>();
     public int contador = 1;
 
-    // Nombre poco claro, muchos parámetros sueltos y flag sin uso
-    // TÉCNICA UTILIZADA: Replace Error Code with Exception
-    // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios:
-    // - Los datos inválidos ya lanzan IllegalArgumentException.
-    // - El método ya no devuelve -1 ni -2 para representar errores.
-    // - La ocupación fallida propaga IllegalStateException en lugar de devolver -3.
+    //TECNICA UTILIZADA: Replace Error Code with Exception
+    //REFACTOR: crearReserva() lanza IllegalArgumentException/IllegalStateException en vez de devolver -1, -2 o -3
 
-    // TECNICA UTILIZADA: Rename Method
-    // REFACTOR: Se renombró el método crearReserva() para reflejar mejor su propósito y mejorar la legibilidad del código.
+    //TECNICA UTILIZADA: Rename Method
+    //REFACTOR: Se renombro hacer() a crearReserva() para que el nombre comunique su proposito
 
     //TECNICA UTILIZADA: Remove Parameter
-    // REFACTOR: Se elimino el parametro boolean imprimir del metodo crearReserva ya que no se utilizaba
-    public int crearReserva(String nombre, String email, boolean socio, Funcion f, char[] filas, int[] numeros, String canal) {
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre del cliente es obligatorio");
+    //REFACTOR: Se elimino el parametro boolean imprimir de crearReserva() porque no se usaba
+
+    //TECNICA UTILIZADA: Add Parameter
+    //REFACTOR: Se agrego el parametro canal a crearReserva() y se propago a la clase y al constructor de Reserva
+
+    //TECNICA UTILIZADA: Preserve Whole Object
+    //REFACTOR: crearReserva() recibe el objeto Cliente completo en vez de nombre, email y socio sueltos
+
+    //TECNICA UTILIZADA: Introduce Parameter Object
+    //REFACTOR: Se reemplazaron char[] filas e int[] numeros por List<Asiento> asientosSolicitados.
+    public int crearReserva(Cliente cliente, Funcion f, List<Asiento> asientosSolicitados, String canal) {
+        if (cliente == null || cliente.nombre == null || cliente.nombre.isBlank()) {
+            throw new IllegalArgumentException("el cliente y su nombre son obligatorios");
         }
         if (f == null) {
-            throw new IllegalArgumentException("La función es obligatoria");
+            throw new IllegalArgumentException("la funcion es obligatoria");
         }
-        if (filas == null || numeros == null || filas.length == 0 || filas.length != numeros.length) {
-            throw new IllegalArgumentException("Los asientos deben tener filas y números válidos");
+        if (asientosSolicitados == null || asientosSolicitados.isEmpty()) {
+            throw new IllegalArgumentException("los asientos son obligatorios");
         }
 
-        List<String> lista = new ArrayList<>();
-        for (int i = 0; i < filas.length; i++) {
-            if (!f.estaDisponible(filas[i], numeros[i])) {
-                throw new IllegalStateException("El asiento ya está ocupado");
+        // validamos primero que todos los asientos esten disponibles
+        for (Asiento a : asientosSolicitados) {
+            if (!f.estaDisponible(a.fila, a.numero)) {
+                throw new IllegalStateException("el asiento " + a.fila + a.numero + " ya esta ocupado");
             }
         }
-        for (int i = 0; i < filas.length; i++) {
-            f.ocupar(filas[i], numeros[i]);
-            lista.add("" + filas[i] + numeros[i]);
+
+        // si todo esta libre, procedemos a ocuparlos
+        List<String> lista = new ArrayList<>();
+        for (Asiento a : asientosSolicitados) {
+            f.ocupar(a.fila, a.numero);
+            lista.add("" + a.fila + a.numero);
         }
-        Cliente c = new Cliente(nombre, email, socio);
-        // TECNICA UTILIZADA: Add parameter
-        // REFACTOR: Se añadio el parametro canal a la clase Reserva como un atributo y parametro de su constructor 
-        // para añadirlo en esta llamada al constructor
-        Reserva r = new Reserva(contador, c, f, lista, canal);
-        if (socio) {
-        // tecnica utlizada: replace parameter with explicit method
-        r.precio = calcularPrecioSocio(r);
-        } else {
-        r.precio = calcularPrecioGeneral(r);
-        }
+
+        // creamos la reserva incluyendo el canal y calculamos el precio
+        Reserva r = new Reserva(contador, cliente, f, lista, canal);
+        r.precio = r.cliente.socio ? calcularPrecioSocio(r) : calcularPrecioGeneral(r);
         db.put(contador, r);
         contador++;
         return r.id;
     }
 
-     // tecnica utilizada: replace parameter with method
-    // refactor: se elimino el parametro tipo porque el metodo ya puede consultar directamente si el cliente es socio desde la reserva
-    public double calcularPrecio(Reserva r) {
-        double base = r.funcion.precio * r.asientos.size();
-        if (r.cliente.socio) {
-            return aplicarDescuento(base, 0.15);
-        } 
-        return base;
-    }
-    
-    // tecnica utlizada: replace parameter with explicit method
-    // Calcula el precio de una reserva general
+    //TECNICA UTILIZADA: Replace Parameter with Explicit Methods
+    //REFACTOR: Se elimino el metodo generico con parametro de tipo String; el llamador invoca
+    //directamente calcularPrecioGeneral() o calcularPrecioSocio() segun r.cliente.socio
     public double calcularPrecioGeneral(Reserva r) {
-    double base = r.funcion.precio * r.asientos.size();
-    return base;
+        return r.funcion.precio * r.asientos.size();
     }
 
-    // Calcula el precio de una reserva para socios
     public double calcularPrecioSocio(Reserva r) {
-    double base = r.funcion.precio * r.asientos.size();
-    return aplicarDescuento(base, 0.15);
+        //TECNICA UTILIZADA: Replace Parameter with Method
+        //REFACTOR: El precio ya no se recibe como parametro; se obtiene de r.funcion.precio.
+        double base = r.funcion.precio * r.asientos.size();
+        return aplicarDescuento(base, 0.15);
     }
-    
-    // tecnica utlizada: parameterize method
+
+    //TECNICA UTILIZADA: Parameterize Method
+    //REFACTOR: descuentoDel15 y descuentoDel25 (duplicados) se unificaron en aplicarDescuento(precio, porcentaje)
     public double aplicarDescuento(double precio, double porcentaje) {
-
-    return precio - precio * porcentaje;
+        return precio - precio * porcentaje;
     }
 
-    // TÉCNICA UTILIZADA: Encapsulate Downcast
-    /* 
-    * - El método buscarReserva ahora recibe int en lugar de String para coincidir con las claves del mapa.
-    * - El cast de Object a Reserva se centralizó en buscarReserva.
-    * - buscar pasó a devolver Reserva directamente y reutiliza buscarReserva.
-    * - Las clases que consultan reservas ya no necesitan realizar el cast manualmente.
-    */
+    //TECNICA UTILIZADA: Encapsulate Downcast
+    //REFACTOR: El cast (Reserva) db.get(id) se centralizo aqui; buscar() y cancelar() lo reutilizan
+    //en vez de castear cada uno desde su lado
     public Reserva buscarReserva(int id) {
         return (Reserva) db.get(id);
     }
 
-    // Downcast repetido en cada llamada
-    public int cancelar(int id) {
+    //TECNICA UTILIZADA: Replace Error Code with Exception
+    //REFACTOR: cancelar() lanza excepciones en vez de devolver -1 (no existe) o -2 (ya cancelada).
+    public void cancelar(int id) {
         Reserva r = buscarReserva(id);
-        if (r == null) return -1;
-        if (r.cancelada) return -2;
+        if (r == null) {
+            throw new java.util.NoSuchElementException("no existe la reserva " + id);
+        }
+        if (r.cancelada) {
+            throw new IllegalStateException("la reserva " + id + " ya estaba cancelada");
+        }
         for (String a : r.asientos) {
-            r.funcion.ocupados.remove(a);
+            //TECNICA UTILIZADA: Hide Method
+            //REFACTOR: se usa r.funcion.liberar(a) en vez de modificar r.funcion.ocupados directamente.
+            r.funcion.liberar(a);
         }
         r.cancelada = true;
-        return 0;
     }
 
     public Reserva buscar(int id) {
-        return (Reserva) db.get(id);
+        return buscarReserva(id);
     }
 }

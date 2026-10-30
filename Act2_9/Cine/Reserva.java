@@ -7,7 +7,9 @@ public class Reserva {
     public List<String> asientos;
     public double precio;
     public boolean cancelada;
-    //Se añadio atributo canal por el problema 3
+    //TECNICA UTILIZADA: Add Parameter
+    //REFACTOR: se agrego el atributo canal para registrar el canal de venta de la reserva.
+    //esto tambien incluye agregar canal al parametro del constructor de Reserva
     public String canal;
 
     public Reserva(int id, Cliente cliente, Funcion funcion, List<String> asientos, String canal) {
@@ -15,11 +17,10 @@ public class Reserva {
         this.cliente = cliente;
         this.funcion = funcion;
         this.asientos = asientos;
-        //Se añadio parametro y asignacion de canal por el problema 3
         this.canal = canal;
     }
 
-    // TÉCNICA UTILIZADA: Remove setting method
-    //remove setCancelada que no se usa
-    
+    //TECNICA UTILIZADA: Remove Setting Method
+    //REFACTOR: se elimino setCancelada(), cancelar() en SistemaReservas asigna el campo directamente.
+
 }

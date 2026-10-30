@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Funcion {
@@ -6,7 +7,9 @@ public class Funcion {
     public int sala;
     public String hora;
     public double precio;
-    public List<String> ocupados = new ArrayList<>();
+    //TECNICA UTILIZADA: Hide Method
+    //REFACTOR: ocupados paso de publico a privado, el acceso externo se restringe mediante getOcupados() y liberar()
+    private List<String> ocupados = new ArrayList<>();
 
     public Funcion(String titulo, int sala, String hora, double precio) {
         this.titulo = titulo;
@@ -15,17 +18,15 @@ public class Funcion {
         this.precio = precio;
     }
 
-    // TÉCNICA UTILIZADA: Replace Exception with Test
-    // TÉCNICA UTILIZADA: Separate Query from modifier
-    // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios:
-    // - Se agregó estaDisponible para consultar antes de modificar la función.
-    // - ocupar dejó de lanzar una excepción para controlar el asiento ocupado.
-    // - ocupar devuelve false si el asiento ya está ocupado.
+    //TECNICA UTILIZADA: Separate Query from Modifier
+    //REFACTOR: estaDisponible() solo consulta, ocupar() solo modifica, sin hacer ambas cosas a la vez
     public boolean estaDisponible(char fila, int numero) {
         String codigo = "" + fila + numero;
         return !ocupados.contains(codigo);
     }
 
+    //TECNICA UTILIZADA: Replace Exception with Test
+    //REFACTOR: ocupar() prueba estaDisponible() y devuelve false en vez de lanzar y capturar una excepcion
     public boolean ocupar(char fila, int numero) {
         if (!estaDisponible(fila, numero)) {
             return false;
@@ -35,6 +36,15 @@ public class Funcion {
         return true;
     }
 
-     // TÉCNICA UTILIZADA: Remove setting method
-    //remove setPrecio que no se usa
+    //TECNICA UTILIZADA: Remove Setting Method
+    //REFACTOR: se elimino setPrecio() porque el precio no debe modificarse tras crear la Funcion
+
+    public List<String> getOcupados() {
+        return Collections.unmodifiableList(ocupados);
+    }
+
+    // libera un asiento cuando se cancela una reserva
+    public void liberar(String codigo) {
+        ocupados.remove(codigo);
+    }
 }
