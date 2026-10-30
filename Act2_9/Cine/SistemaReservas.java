@@ -49,7 +49,12 @@ public class SistemaReservas {
     }
 
     // TÉCNICA UTILIZADA: Encapsulate Downcast
-    // REFACTOR: Al aplicar esta técnica se realizaron los siguientes cambios…
+    /* 
+    * - El método buscarReserva ahora recibe int en lugar de String para coincidir con las claves del mapa.
+    * - El cast de Object a Reserva se centralizó en buscarReserva.
+    * - buscar pasó a devolver Reserva directamente y reutiliza buscarReserva.
+    * - Las clases que consultan reservas ya no necesitan realizar el cast manualmente.
+    */
     public Reserva buscarReserva(int id) {
         return (Reserva) db.get(id);
     }
